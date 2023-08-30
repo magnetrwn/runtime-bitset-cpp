@@ -10,7 +10,7 @@
 #include "rbitset.hpp"
 
 using RB::RuntimeBitset;
-constexpr size_t warmups = 2, rounds = 24, rows = 480, cols = 640;
+constexpr size_t warmups = 2, rounds = 12, rows = 2048, cols = 2048;
 
 
 ushort prime() {
@@ -96,7 +96,7 @@ double getDeltaPercent(size_t n, size_t d) {
 }
 
 int main() {
-    printf("Running %lu rounds with %lu rows and %lu cols...\n", rounds, rows, cols);
+    printf("Running %lu rounds with %lu rows and %lu cols.\n", rounds, rows, cols);
 
     std::unique_ptr<RuntimeBitset<>[]> runtimeBitsetGrid = bitsetGridGen(rows, cols);
     std::array<std::bitset<cols>, rows> compileTimeBitsetGrid;
@@ -107,6 +107,8 @@ int main() {
     size_t msDequeBools = 0;
 
     for (size_t i = 0; i < rounds; i++) {
+        printf("\rRound: %lu", i+1);
+        fflush(stdout);
         msRuntimeBitset += benchmarkGrid(runtimeBitsetGrid);
         msCompileTimeBitset += benchmarkGrid(compileTimeBitsetGrid);
         msDequeBools += benchmarkGrid(dequeBoolsGrid);
@@ -116,7 +118,7 @@ int main() {
     msCompileTimeBitset /= rounds;
     msDequeBools /= rounds;
 
-    printf("------------------------------------------------------------\n");
+    printf("\rRound: Done\n------------------------------------------------------------\n");
     printf("| A | RuntimeBitset<>(cols)[rows] completed in: %luus.\n", msRuntimeBitset);
     printf("| B | std::array<std::bitset<cols>, rows> completed in: %luus.\n", msCompileTimeBitset);
     printf("| C | std::deque<std::deque<bool>> completed in: %luus.\n", msDequeBools);
