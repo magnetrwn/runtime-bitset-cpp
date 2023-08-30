@@ -144,4 +144,4 @@ $ ./example
 
 All code is under MIT, enjoy. Feel free to help, report issues, fork or send PRs if you want!
 
-**Note:** I created this because I needed a runtime bitset with a simple implementation, and reasonably small memory footprint, for my other project at `magnetrwn/margolus-cpp`, but it's very likely to be still inefficient in access time versus compile-time `std::bitset`.
+**Note:** I created this because I needed a runtime bitset with a simple implementation, and reasonably small memory footprint, for my other project at `magnetrwn/margolus-cpp`, but it's still inefficient in access time versus compile-time `std::bitset`. It's also missing some relevant features like counting and bitwise operations for now.
