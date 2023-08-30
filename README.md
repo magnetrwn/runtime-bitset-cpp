@@ -71,19 +71,21 @@ Here are the includes used by the library:
 
 # Speed
 
-`tests.cpp` basically has very simple stuff to test speed against other possible implementations of data structures using bitsets and arrays, and more. Currently it seems that compile-time arrays of bitsets are +50% faster than raw arrays of RuntimeBitsets, but when working with larger sizes the compile-time structure segfaults, while RuntimeBitset does not.
+`benchmark.cpp` basically has simple benchmarks to test speed against other possible implementations of data structures using bitsets and arrays, and more. Cache linearity is a relevant factor here, so the benchmark tries to be a little randomic as well.
 
-Here is a sample run from running `tests.cpp`:
+Here is a sample run from running `benchmark.cpp`:
 ```
-Running with 2000 rows and 2000 cols.
+$ ./benchmark
+Running 24 rounds with 480 rows and 640 cols...
 ------------------------------------------------------------
-| A | RuntimeBitset<>(cols)[rows] completed in: 73ms.
-| B | std::array<std::bitset<cols>, rows> completed in: 47ms.
-| C | std::deque<std::deque<bool>> completed in: 211ms.
+| A | RuntimeBitset<>(cols)[rows] completed in: 95237us.
+| B | std::array<std::bitset<cols>, rows> completed in: 85988us.
+| C | std::deque<std::deque<bool>> completed in: 143360us.
 ------------------------------------------------------------
-A takes +55.3% time than B.
-A takes -65.4% time than C.
+A takes +10.8% time than B.
+A takes -33.6% time than C.
 ```
+Of course results on different machines will change, but there is consistency between results from runs, at around ±5%.
 
 # Examples
 
@@ -125,7 +127,7 @@ int main() {
 }
 ```
 When run:
-```sh
+```
 $ ./example
 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0
 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1
