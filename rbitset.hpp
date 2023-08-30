@@ -60,7 +60,7 @@ namespace RB {
             memset(data, 255*((size_t) fill_with) , size_ * sizeof(BlockType));
             #else
             for (BlockType i = 0; i < size_; ++i) {
-                data[i] = (fill_with) ? ~0 : 0;
+                data[i] = (fill_with) ? ~static_cast<BlockType>(0) : 0;
             }
             #endif
         }
