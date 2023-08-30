@@ -69,6 +69,18 @@ Here are the includes used by the library:
 + `<cstring>` → Used for `memset()` and `memcpy()`. You can change the precompiler define `RUNTIME_BITSET_USE_CSTRING_` to false if necessary, which will adjust the code to `for` loop alternatives.
 + `<cstddef>` → Used only for standard C types, specifically `size_t`.
 
+# Speed
+
+`tests.cpp` basically has very simple stuff to test speed against other possible implementations of data structures using bitsets and arrays, and more. Currently it seems that compile-time arrays of bitsets are +50% faster than raw arrays of RuntimeBitsets, but when working with larger sizes the compile-time structure segfaults, while RuntimeBitset does not.
+
+Here is a sample run from running `tests.cpp`:
+```
+Running with 6000 rows and 4000 cols.
+RuntimeBitset<>(cols)[rows] completed in: 472ms.
+std::array<std::bitset<cols>, rows> completed in: 316ms.
+RuntimeBitset takes +49.4% time than the compile-time STL version.
+```
+
 # Examples
 
 This is a simple way to implement a memory efficient grid (although I guess it can be improved even more by making it all fit in a single big bitset and then offset indexes?):
