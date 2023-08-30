@@ -75,10 +75,14 @@ Here are the includes used by the library:
 
 Here is a sample run from running `tests.cpp`:
 ```
-Running with 6000 rows and 4000 cols.
-RuntimeBitset<>(cols)[rows] completed in: 472ms.
-std::array<std::bitset<cols>, rows> completed in: 316ms.
-RuntimeBitset takes +49.4% time than the compile-time STL version.
+Running with 2000 rows and 2000 cols.
+------------------------------------------------------------
+| A | RuntimeBitset<>(cols)[rows] completed in: 73ms.
+| B | std::array<std::bitset<cols>, rows> completed in: 47ms.
+| C | std::deque<std::deque<bool>> completed in: 211ms.
+------------------------------------------------------------
+A performs +55.3% than B.
+A performs -65.4% than C.
 ```
 
 # Examples
