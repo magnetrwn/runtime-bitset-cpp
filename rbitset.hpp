@@ -43,44 +43,48 @@ namespace RB {
     class RuntimeBitset {
     protected:
         friend class BitReference<BlockType>;
-        BlockType size_; // Number of BlockType elements to fit bits in data
-        BlockType *data;
+        size_t availableBits_;   // Number of bits passed to the constructor
+        size_t allocatedBlocks_; // Number of BlockType elements to fit n bits in data
+        BlockType *data_;
 
     public:
         inline RuntimeBitset()
-            : size_(0),
-            data(nullptr) {}
+            : availableBits_(0),
+            allocatedBlocks_(0),
+            data_(nullptr) {}
 
         inline RuntimeBitset(const size_t bits, const bool fill_with = false)
-            : size_(bits / (sizeof(BlockType) * 8) + (size_t) !(bits % (sizeof(BlockType) * 8) == 0)),
-            data(nullptr) {
-            data = new BlockType[size_];
+            : availableBits_(bits),
+            allocatedBlocks_(bits / (sizeof(BlockType) * 8) + (size_t) !(bits % (sizeof(BlockType) * 8) == 0)),
+            data_(nullptr) {
 
+            data_ = new BlockType[allocatedBlocks_];
             #if RUNTIME_BITSET_USE_CSTRING_
-            memset(data, 255*((size_t) fill_with) , size_ * sizeof(BlockType));
+            memset(data_, 255*((size_t) fill_with) , allocatedBlocks_ * sizeof(BlockType));
             #else
-            for (BlockType i = 0; i < size_; ++i) {
-                data[i] = (fill_with) ? ~static_cast<BlockType>(0) : 0;
+            for (BlockType i = 0; i < allocatedBlocks_; ++i) {
+                data_[i] = (fill_with) ? ~static_cast<BlockType>(0) : 0;
             }
             #endif
         }
 
         inline virtual ~RuntimeBitset() {
-            if (data)
-                delete[] data;
+            if (data_)
+                delete[] data_;
         }
 
         inline RuntimeBitset& operator=(const RuntimeBitset& lv) {
             if (this != &lv) {
-                if (data)
-                    delete[] data;
-                size_ = lv.size_;
-                data = new BlockType[size_];
+                if (data_)
+                    delete[] data_;
+                availableBits_ = lv.availableBits_;
+                allocatedBlocks_ = lv.allocatedBlocks_;
+                data_ = new BlockType[allocatedBlocks_];
                 #if RUNTIME_BITSET_USE_CSTRING_
-                memcpy(data, lv.data, size_ * sizeof(BlockType));
+                memcpy(data_, lv.data_, allocatedBlocks_ * sizeof(BlockType));
                 #else
-                for (BlockType i = 0; i < size_; ++i) {
-                    data[i] = lv.data[i];
+                for (BlockType i = 0; i < allocatedBlocks_; ++i) {
+                    data_[i] = lv.data_[i];
                 }
                 #endif
             }
@@ -89,10 +93,11 @@ namespace RB {
 
         inline RuntimeBitset& operator=(RuntimeBitset&& rv) noexcept {
             if (this != &rv) {
-                delete[] data;
-                size_ = rv.size_;
-                data = rv.data;
-                rv.data = nullptr;
+                delete[] data_;
+                availableBits_ = rv.availableBits_;
+                allocatedBlocks_ = rv.allocatedBlocks_;
+                data_ = rv.data_;
+                rv.data_ = nullptr;
             }
             return *this;
         }
@@ -102,11 +107,11 @@ namespace RB {
         }
 
         inline size_t size() const {
-            return size_;
+            return availableBits_;
         }
 
-        inline size_t bits() const {
-            return size_ * sizeof(BlockType) * 8;
+        inline size_t bytes() const {
+            return allocatedBlocks_ * sizeof(BlockType);
         }
     };
 
@@ -119,19 +124,19 @@ namespace RB {
         const BlockType mask_;
 
         BitReference(const RuntimeBitset<BlockType>& bs, BlockType idx)
-            : bitset_(bs), block_(idx / bs.bits()), mask_(static_cast<BlockType>(1) << (idx % bs.bits())) {}
+            : bitset_(bs), block_(idx / bs.size()), mask_(static_cast<BlockType>(1) << (idx % bs.size())) {}
 
     public:
         BitReference& operator=(bool value) {
             if (value)
-                bitset_.data[block_] |= mask_;
+                bitset_.data_[block_] |= mask_;
             else
-                bitset_.data[block_] &= ~mask_;
+                bitset_.data_[block_] &= ~mask_;
             return *this;
         }
 
         operator bool() const {
-            return (bitset_.data[block_] & mask_) != 0;
+            return (bitset_.data_[block_] & mask_) != 0;
         }
     };
 

@@ -30,6 +30,8 @@ int main() {
         printf("\n");
     }
 
+    printf("Each bitset: %lu bools in %lu bytes.\n", grid[0].size(), grid[0].bytes());
+
     return 0;
 }
 
