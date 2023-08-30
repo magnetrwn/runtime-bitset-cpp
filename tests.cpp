@@ -5,13 +5,14 @@
 
 #include <array>
 #include <bitset>
+#include <deque>
 
 #include <chrono>
 
 #include "rbitset.hpp"
 
 using RB::RuntimeBitset;
-constexpr size_t rows = 6000, cols = 4000;
+constexpr size_t rows = 2000, cols = 2000;
 
 
 std::unique_ptr<RuntimeBitset<>[]> bitsetGridGen(const size_t rows, const size_t cols) {
@@ -58,19 +59,43 @@ size_t benchmarkCompileTimeBitset() {
     return std::chrono::duration_cast<std::chrono::milliseconds>(tend - tbegin).count();
 }
 
+size_t benchmarkDequeBools() {
+    std::chrono::time_point tbegin = std::chrono::high_resolution_clock::now();
+
+    std::deque<std::deque<bool>> grid(rows, std::deque<bool>(cols, false));
+
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            grid[i][j] = (i%2 == j%2);
+            //printf("%hhx ", (bool) grid[i][j]);
+        }
+        //printf("\n");
+    }
+
+    std::chrono::time_point tend = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(tend - tbegin).count();
+}
+
+double getDeltaPercent(size_t n, size_t d) {
+    if (n == 0 || d == 0)
+        return 0;
+    else
+        return (( (double) n / (double) d ) - 1) * 100;
+}
+
 int main() {
-    size_t msRuntimeBitset, msCompileTimeBitset;
-    msRuntimeBitset = benchmarkRuntimeBitset();
-    msCompileTimeBitset = benchmarkCompileTimeBitset();
+    size_t msRuntimeBitset = benchmarkRuntimeBitset();
+    size_t msCompileTimeBitset = benchmarkCompileTimeBitset();
+    size_t msDequeBools = benchmarkDequeBools();
 
     printf("Running with %lu rows and %lu cols.\n", rows, cols);
-    printf("RuntimeBitset<>(cols)[rows] completed in: %lums.\n", msRuntimeBitset);
-    printf("std::array<std::bitset<cols>, rows> completed in: %lums.\n\n", msCompileTimeBitset);
-
-    if (msRuntimeBitset != 0 and msCompileTimeBitset != 0) {
-        double delta = (( (double) msRuntimeBitset / (double) msCompileTimeBitset ) - 1) * 100;
-        printf("RuntimeBitset takes %+.1f%% time than the compile-time STL version.\n", delta);
-    }
+    printf("------------------------------------------------------------\n");
+    printf("| A | RuntimeBitset<>(cols)[rows] completed in: %lums.\n", msRuntimeBitset);
+    printf("| B | std::array<std::bitset<cols>, rows> completed in: %lums.\n", msCompileTimeBitset);
+    printf("| C | std::deque<std::deque<bool>> completed in: %lums.\n", msDequeBools);
+    printf("------------------------------------------------------------\n");
+    printf("A performs %+.1f%% than B.\n", getDeltaPercent(msRuntimeBitset, msCompileTimeBitset));
+    printf("A performs %+.1f%% than C.\n", getDeltaPercent(msRuntimeBitset, msDequeBools));
 
     return 0;
 }
