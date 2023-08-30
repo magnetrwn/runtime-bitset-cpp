@@ -94,8 +94,8 @@ int main() {
     printf("| B | std::array<std::bitset<cols>, rows> completed in: %lums.\n", msCompileTimeBitset);
     printf("| C | std::deque<std::deque<bool>> completed in: %lums.\n", msDequeBools);
     printf("------------------------------------------------------------\n");
-    printf("A performs %+.1f%% than B.\n", getDeltaPercent(msRuntimeBitset, msCompileTimeBitset));
-    printf("A performs %+.1f%% than C.\n", getDeltaPercent(msRuntimeBitset, msDequeBools));
+    printf("A takes %+.1f%% time than B.\n", getDeltaPercent(msRuntimeBitset, msCompileTimeBitset));
+    printf("A takes %+.1f%% time than C.\n", getDeltaPercent(msRuntimeBitset, msDequeBools));
 
     return 0;
 }

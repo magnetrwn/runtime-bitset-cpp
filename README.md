@@ -81,8 +81,8 @@ Running with 2000 rows and 2000 cols.
 | B | std::array<std::bitset<cols>, rows> completed in: 47ms.
 | C | std::deque<std::deque<bool>> completed in: 211ms.
 ------------------------------------------------------------
-A performs +55.3% than B.
-A performs -65.4% than C.
+A takes +55.3% time than B.
+A takes -65.4% time than C.
 ```
 
 # Examples
