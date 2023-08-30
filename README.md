@@ -61,11 +61,53 @@ bool demonstratingBitsets() {
 
 ```
 
+BitReference is able to act on a single bit by using a bit mask stored in the instance, together with a block index to locate the block where the bit is located.
+
 # Includes
 
 Here are the includes used by the library:
 + `<cstring>` → Used for `memset()` and `memcpy()`. You can change the precompiler define `RUNTIME_BITSET_USE_CSTRING_` to false if necessary, which will adjust the code to `for` loop alternatives.
 + `<cstddef>` → Used only for standard C types, specifically `size_t`.
+
+# Examples
+
+This is a simple way to implement a memory efficient grid (although I guess it can be improved even more by making it all fit in a single big bitset and then offset indexes?):
+```cpp
+#include <cstdio>
+#include <cstddef>
+#include <memory>
+
+#include "rbitset.hpp"
+
+using RB::RuntimeBitset;
+
+
+std::unique_ptr<RuntimeBitset<>[]> bitsetGridGen(const size_t rows, const size_t cols) {
+    auto grid = std::make_unique<RuntimeBitset<>[]>(rows);
+
+    for (size_t i = 0; i < rows; i++) {
+        grid[i] = RuntimeBitset<>(cols, false);
+    }
+
+    return grid;
+}
+
+int main() {
+    const size_t rows = 8, cols = 30;
+
+    auto grid = bitsetGridGen(rows, cols);
+
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            grid[i][j] = (i%2 == j%2);
+            printf("%hhx ", (bool) grid[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
+```
 
 # Contributing and License
 

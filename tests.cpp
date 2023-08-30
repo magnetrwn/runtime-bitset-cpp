@@ -1,70 +1,45 @@
 #include <cstdio>
+#include <cstddef>
+#include <memory>
+
 #include "rbitset.hpp"
 
 using RB::RuntimeBitset;
 
-int main() {
-    RuntimeBitset<> a, b;
-    a = RuntimeBitset<>(20);
-    for (size_t i = 0; i < a.bits(); i++) {
-        a[i] = (i%3 != 0);
-        printf("%hhx ", (bool) a[i]);
+
+std::unique_ptr<RuntimeBitset<>[]> bitsetGridGen(const size_t rows, const size_t cols) {
+    auto grid = std::make_unique<RuntimeBitset<>[]>(rows);
+
+    for (size_t i = 0; i < rows; i++) {
+        grid[i] = RuntimeBitset<>(cols, false);
     }
-    printf("\n");
-    b = a;
-    //b = std::move(a);
-    for (size_t i = 0; i < a.bits(); i++)
-        printf("%hhx ", (bool) b[i]);
-    printf("\n");
-    for (size_t i = 0; i < a.bits(); i++)
-        printf("%hhx ", (bool) a[i]);
-    printf("\n");
 
-    RuntimeBitset<> bs(20);
-    bs[0] = true;
-    auto firstIndexRef = bs[0];
-    return (bool) bs[0];
+    return grid;
+}
 
-    /*for (size_t n = 0; n < 3500; n++) {
-        RuntimeBitset<BlockType> a(n);
+int main() {
+    const size_t rows = 8, cols = 30;
 
-        for (size_t i = 0; i < n; i++) {
-            a[i] = true;
+    auto grid = bitsetGridGen(rows, cols);
+
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            grid[i][j] = (i%2 == j%2);
+            printf("%hhx ", (bool) grid[i][j]);
         }
+        printf("\n");
+    }
 
-        printf("\n%lu: \t", n);
-
-        for (size_t i = 0; i < n; i++) {
-            if (i%(sizeof(BlockType)*8) == 0 && i != 0)
-                printf(" ");
-
-            if ((bool) a[i] != true)
-                printf("\x1B[41m");
-            else
-                printf("\x1B[92m");
-            printf("%d\x1B[0m", (bool) a[i]);
-        }
-
-        printf("\nb: \t");
-
-        for (size_t i = 0; i < n; i++) {
-            if (i%(sizeof(BlockType)*8) == 0 && i != 0)
-                printf(" ");
-            printf("%lu", a[i].block_%10);
-        }
-
-        printf("\nm: \t");
-
-        for (size_t i = 0; i < n; i++) {
-            if (i%(sizeof(BlockType)*8) == 0 && i != 0)
-                printf(" ");
-
-            if (a[i].mask_%10 == 1)
-                printf("\x1B[04m");
-            printf("%lu\x1B[0m", a[i].mask_%10);
-        }
-    }*/
-
-    printf("\n\nOK\n");
     return 0;
 }
+
+/*
+HEAP SUMMARY:
+==87558==     in use at exit: 0 bytes in 0 blocks
+==87558==   total heap usage: 11 allocs, 11 frees, 75,016 bytes allocated
+==87558==
+==87558== All heap blocks were freed -- no leaks are possible
+==87558==
+==87558== For lists of detected and suppressed errors, rerun with: -s
+==87558== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+*/
