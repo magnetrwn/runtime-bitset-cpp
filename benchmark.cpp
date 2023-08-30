@@ -10,7 +10,7 @@
 #include "rbitset.hpp"
 
 using RB::RuntimeBitset;
-constexpr size_t warmups = 2, rounds = 12, rows = 2048, cols = 2048;
+constexpr size_t warmups = 2, rounds = 4, rows = 1000, cols = 1000;
 
 
 ushort prime() {
@@ -101,30 +101,38 @@ int main() {
     std::unique_ptr<RuntimeBitset<>[]> runtimeBitsetGrid = bitsetGridGen(rows, cols);
     std::array<std::bitset<cols>, rows> compileTimeBitsetGrid;
     std::deque<std::deque<bool>> dequeBoolsGrid(rows, std::deque<bool>(cols, false));
+    std::array<std::array<bool, cols>, rows> arrayBoolsGrid;
+    bool rawMatrixBoolsGrid[rows][cols];
 
-    size_t msRuntimeBitset = 0;
-    size_t msCompileTimeBitset = 0;
-    size_t msDequeBools = 0;
+    size_t usRuntimeBitset = 0;
+    size_t usCompileTimeBitset = 0;
+    size_t usDequeBools = 0;
+    size_t usArrayBools = 0;
+    size_t usRawMatrixBoolsGrid = 0;
 
     for (size_t i = 0; i < rounds; i++) {
         printf("\rRound: %lu", i+1);
         fflush(stdout);
-        msRuntimeBitset += benchmarkGrid(runtimeBitsetGrid);
-        msCompileTimeBitset += benchmarkGrid(compileTimeBitsetGrid);
-        msDequeBools += benchmarkGrid(dequeBoolsGrid);
+        usRuntimeBitset += benchmarkGrid(runtimeBitsetGrid);
+        usCompileTimeBitset += benchmarkGrid(compileTimeBitsetGrid);
+        usDequeBools += benchmarkGrid(dequeBoolsGrid);
+        usArrayBools += benchmarkGrid(arrayBoolsGrid);
+        usRawMatrixBoolsGrid += benchmarkGrid(rawMatrixBoolsGrid);
     }
 
-    msRuntimeBitset /= rounds;
-    msCompileTimeBitset /= rounds;
-    msDequeBools /= rounds;
+    usRuntimeBitset /= rounds;
+    usCompileTimeBitset /= rounds;
+    usDequeBools /= rounds;
+    usArrayBools /= rounds;
+    usRawMatrixBoolsGrid /= rounds;
 
-    printf("\rRound: Done\n------------------------------------------------------------\n");
-    printf("| A | RuntimeBitset<>(cols)[rows] completed in: %luus.\n", msRuntimeBitset);
-    printf("| B | std::array<std::bitset<cols>, rows> completed in: %luus.\n", msCompileTimeBitset);
-    printf("| C | std::deque<std::deque<bool>> completed in: %luus.\n", msDequeBools);
-    printf("------------------------------------------------------------\n");
-    printf("A takes %+.1f%% time than B.\n", getDeltaPercent(msRuntimeBitset, msCompileTimeBitset));
-    printf("A takes %+.1f%% time than C.\n", getDeltaPercent(msRuntimeBitset, msDequeBools));
+    printf("\rRound: Done\n------------------------------------------------------------------\n");
+    printf("RuntimeBitset<>(cols)[rows]              | %lu us \t| Baseline\n", usRuntimeBitset);
+    printf("std::array<std::bitset<cols>, rows>      | %lu us \t| %+.1f%%\n", usCompileTimeBitset, getDeltaPercent(usCompileTimeBitset, usRuntimeBitset));
+    printf("std::deque<std::deque<bool>>             | %lu us \t| %+.1f%%\n", usDequeBools, getDeltaPercent(usDequeBools, usRuntimeBitset));
+    printf("std::array<std::array<bool, cols>, rows> | %lu us \t| %+.1f%%\n", usArrayBools, getDeltaPercent(usArrayBools, usRuntimeBitset));
+    printf("bool[rows][cols]                         | %lu us \t| %+.1f%%\n", usRawMatrixBoolsGrid, getDeltaPercent(usRawMatrixBoolsGrid, usRuntimeBitset));
+    printf("------------------------------------------------------------------\n");
 
     return 0;
 }

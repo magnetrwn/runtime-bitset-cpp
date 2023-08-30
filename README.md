@@ -73,18 +73,19 @@ Here are the includes used by the library:
 
 `benchmark.cpp` basically has simple benchmarks to test speed against other possible implementations of data structures using bitsets and arrays, and more. Cache linearity is a relevant factor here, so the benchmark tries to be a little randomic as well.
 
-Here is a long sample run from running `benchmark.cpp`:
+**Note:** keep in mind using a one-dimensional data structure with index offsetting is not being benchmarked here, but quite likely to improve speed and memory footprint.
+
+Here is a sample run from running `benchmark.cpp`:
 ```
-$ ./benchmark
-Running 48 rounds with 2048 rows and 2048 cols.
+Running 4 rounds with 1000 rows and 1000 cols.
 Round: Done
-------------------------------------------------------------
-| A | RuntimeBitset<>(cols)[rows] completed in: 1353193us.
-| B | std::array<std::bitset<cols>, rows> completed in: 1314047us.
-| C | std::deque<std::deque<bool>> completed in: 2567842us.
-------------------------------------------------------------
-A takes +3.0% time than B.
-A takes -47.3% time than C.
+------------------------------------------------------------------
+RuntimeBitset<>(cols)[rows]              | 326710 us    | Baseline
+std::array<std::bitset<cols>, rows>      | 300917 us    | -7.9%
+std::deque<std::deque<bool>>             | 538531 us    | +64.8%
+std::array<std::array<bool, cols>, rows> | 229400 us    | -29.8%
+bool[rows][cols]                         | 220894 us    | -32.4%
+------------------------------------------------------------------
 ```
 Of course time results on different machines will change, but there is consistency between results from runs, and similarities on performance deltas between implementations.
 
