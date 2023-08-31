@@ -106,6 +106,10 @@ namespace RB {
             return BitReference<BlockType>(*this, idx);
         }
 
+        inline const BitReference<BlockType> operator[](const size_t idx) const {
+            return BitReference<BlockType>(*this, idx);
+        }
+
         inline size_t size() const {
             return availableBits_;
         }
